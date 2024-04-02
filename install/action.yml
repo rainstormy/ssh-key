@@ -1,0 +1,50 @@
+name: Install SSH key
+description: Stores a private SSH key on the GitHub Actions runner and adds it to the SSH agent.
+author: Steffen Diswal
+
+inputs:
+  key-name:
+    description: The name of the file in the `.ssh` directory that stores the value of `__private-key__`.
+    required: false
+    default: "id_ed25519"
+  #
+  known-hosts:
+    description: A newline-separated list of trusted remote host keys to be stored in `.ssh/known_hosts`.
+    required: true
+  #
+  __private-key__:
+    description: The private SSH key to be stored in `.ssh/<key-name>` and added to the SSH agent on the GitHub Actions runner.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - run: |
+        if [[ ! $KEY_NAME =~ ^[0-9A-Za-z_.-]+$ ]]; then
+          echo 'Input parameter `key-name` must be non-empty and contain letters, numbers, dashes, underscores, and periods only.'
+          exit 2
+        elif [[ -z "$KNOWN_HOSTS" ]]; then
+          echo 'Input parameter `known-hosts` must be non-empty.'
+          exit 2
+        elif [[ -z "$PRIVATE_KEY" ]]; then
+          echo 'Input parameter `__private-key__` must be non-empty.'
+          exit 2
+        fi
+
+        mkdir ~/.ssh
+        echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+        chmod 644 ~/.ssh/known_hosts
+
+        echo "$PRIVATE_KEY" > ~/.ssh/$KEY_NAME
+        chmod 600 ~/.ssh/$KEY_NAME
+
+        eval $(ssh-agent -s)
+        echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
+        echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+
+        ssh-add ~/.ssh/$KEY_NAME
+      env:
+        KEY_NAME: ${{ inputs.key-name }}
+        KNOWN_HOSTS: ${{ inputs.known-hosts }}
+        PRIVATE_KEY: ${{ inputs.__private-key__ }}
+      shell: bash
