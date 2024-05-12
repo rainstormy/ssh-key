@@ -19,6 +19,7 @@ inputs:
 runs:
   using: composite
   steps:
+    # language=sh
     - run: |
         if [[ ! $KEY_NAME =~ ^[0-9A-Za-z_.-]+$ ]]; then
           echo 'Input parameter `key-name` must be non-empty and contain letters, numbers, dashes, underscores, and periods only.'
