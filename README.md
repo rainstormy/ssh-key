@@ -4,7 +4,7 @@ This reusable GitHub Action installs a private SSH key onto an Ubuntu runner.
 
 > [!CAUTION]  
 > As this action processes sensitive information, please review the action steps
-> in [`install/action.yml`](https://github.com/rainstormy-actions/ssh-key/blob/main/install/action.yml)
+> in [`install/action.yml`](https://github.com/rainstormy/ssh-key/blob/main/install/action.yml)
 > prior to using the action.
 
 ## Usage
@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 1
     steps:
       - name: Install an SSH key
-        uses: rainstormy-actions/ssh-key/install@v1
+        uses: rainstormy/ssh-key/install@v1
         with:
           known-hosts: ${{ secrets.KNOWN_HOSTS }}
           __private-key__: ${{ secrets.PRIVATE_SSH_KEY }}
