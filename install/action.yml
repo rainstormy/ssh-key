@@ -21,7 +21,7 @@ runs:
   steps:
     # language=sh
     - run: |
-        if [[ ! $KEY_NAME =~ ^[0-9A-Za-z_.-]+$ ]]; then
+        if [[ ! "$KEY_NAME" =~ ^[0-9A-Za-z_.-]+$ ]]; then
           echo 'Input parameter `key-name` must be non-empty and contain letters, numbers, dashes, underscores, and periods only.'
           exit 2
         elif [[ -z "$KNOWN_HOSTS" ]]; then
@@ -32,18 +32,18 @@ runs:
           exit 2
         fi
 
-        mkdir ~/.ssh
-        echo "$KNOWN_HOSTS" > ~/.ssh/known_hosts
-        chmod 644 ~/.ssh/known_hosts
+        mkdir "$HOME/.ssh"
+        echo "$KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+        chmod 644 "$HOME/.ssh/known_hosts"
 
-        echo "$PRIVATE_KEY" > ~/.ssh/$KEY_NAME
-        chmod 600 ~/.ssh/$KEY_NAME
+        echo "$PRIVATE_KEY" > "$HOME/.ssh/$KEY_NAME"
+        chmod 600 "$HOME/.ssh/$KEY_NAME"
 
-        eval $(ssh-agent -s)
-        echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> $GITHUB_ENV
-        echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> $GITHUB_ENV
+        eval "$(ssh-agent -s)"
+        echo "SSH_AGENT_PID=$SSH_AGENT_PID" >> "$GITHUB_ENV"
+        echo "SSH_AUTH_SOCK=$SSH_AUTH_SOCK" >> "$GITHUB_ENV"
 
-        ssh-add ~/.ssh/$KEY_NAME
+        ssh-add "$HOME/.ssh/$KEY_NAME"
       env:
         KEY_NAME: ${{ inputs.key-name }}
         KNOWN_HOSTS: ${{ inputs.known-hosts }}
